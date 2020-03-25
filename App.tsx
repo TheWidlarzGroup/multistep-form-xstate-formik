@@ -8,23 +8,48 @@
  * @format
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, StatusBar} from 'react-native';
 import {ApplicationProvider, Layout, Text, Button} from '@ui-kitten/components';
 import {mapping, dark as darkTheme} from '@eva-design/eva';
+import {getUser, updateUser} from './src/data/Api';
+import {UserData} from './src/types/UserData.types';
 
 const App = () => {
+  const [user, setUser] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  const fetchData = async () => {
+    setUser(user ? await getUser({...user}) : await getUser());
+  };
+
+  const updateData = async () => {
+    if (user) {
+      setUser(await updateUser({...user, name: 'Kathy'}));
+    }
+  };
+
   return (
     <ApplicationProvider mapping={mapping} theme={darkTheme}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
       <Layout style={styles.container}>
         <Text category="h1">Form App</Text>
         <Button
-          style={styles.button}
           size="large"
           appearance="ghost"
-          status="basic">
-          Update you data
+          status="basic"
+          onPress={fetchData}>
+          Get user
+        </Button>
+        <Button
+          size="large"
+          appearance="ghost"
+          status="success"
+          onPress={updateData}>
+          Update user
         </Button>
       </Layout>
     </ApplicationProvider>
@@ -36,9 +61,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  button: {
-    margin: 8,
   },
 });
 
