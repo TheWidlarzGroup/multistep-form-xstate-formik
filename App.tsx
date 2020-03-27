@@ -7,61 +7,42 @@
  *
  * @format
  */
-
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, StatusBar} from 'react-native';
-import {ApplicationProvider, Layout, Text, Button} from '@ui-kitten/components';
+import 'react-native-gesture-handler';
+import React from 'react';
+import {StatusBar, SafeAreaView, StyleSheet} from 'react-native';
+import {ApplicationProvider, Layout} from '@ui-kitten/components';
 import {mapping, dark as darkTheme} from '@eva-design/eva';
-import {getUser, updateUser} from './src/data/Api';
-import {UserData} from './src/types/UserData.types';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import Home from './src/screens/Home';
+import FormName from './src/screens/FormName';
+import FormAddress from './src/screens/FormAddress';
+import FormPayment from './src/screens/FormPayment';
+
+const Stack = createStackNavigator();
 
 const App = () => {
-  const [user, setUser] = useState<UserData | null>(null);
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-
-  const fetchData = async () => {
-    setUser(user ? await getUser({...user}) : await getUser());
-  };
-
-  const updateData = async () => {
-    if (user) {
-      setUser(await updateUser({...user, name: 'Kathy'}));
-    }
-  };
-
   return (
-    <ApplicationProvider mapping={mapping} theme={darkTheme}>
-      <StatusBar barStyle="light-content" />
-      <Layout style={styles.container}>
-        <Text category="h1">Form App</Text>
-        <Button
-          size="large"
-          appearance="ghost"
-          status="basic"
-          onPress={fetchData}>
-          Get user
-        </Button>
-        <Button
-          size="large"
-          appearance="ghost"
-          status="success"
-          onPress={updateData}>
-          Update user
-        </Button>
-      </Layout>
-    </ApplicationProvider>
+    <NavigationContainer>
+      <ApplicationProvider mapping={mapping} theme={darkTheme}>
+        <Layout style={styles.wrapper}>
+          <SafeAreaView style={styles.wrapper}>
+            <StatusBar barStyle="light-content" />
+            <Stack.Navigator screenOptions={{headerShown: false}}>
+              <Stack.Screen name="Home" component={Home} />
+              <Stack.Screen name="FormName" component={FormName} />
+              <Stack.Screen name="FormAddress" component={FormAddress} />
+              <Stack.Screen name="FormPayment" component={FormPayment} />
+            </Stack.Navigator>
+          </SafeAreaView>
+        </Layout>
+      </ApplicationProvider>
+    </NavigationContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  wrapper: {flex: 1},
 });
 
 export default App;
