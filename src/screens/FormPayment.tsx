@@ -8,7 +8,7 @@ const FormPayment = () => {
   const {goBack, navigate} = useNavigation();
 
   const backBtn = useCallback(() => goBack(), [goBack]);
-  const goNext = useCallback(() => navigate(''), [navigate]);
+  const goNext = useCallback(() => navigate('Success'), [navigate]);
 
   return (
     <>

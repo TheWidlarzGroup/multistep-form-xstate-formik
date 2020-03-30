@@ -18,6 +18,7 @@ import Home from './src/screens/Home';
 import FormName from './src/screens/FormName';
 import FormAddress from './src/screens/FormAddress';
 import FormPayment from './src/screens/FormPayment';
+import Success from './src/screens/Success';
 
 const Stack = createStackNavigator();
 
@@ -33,6 +34,7 @@ const App = () => {
               <Stack.Screen name="FormName" component={FormName} />
               <Stack.Screen name="FormAddress" component={FormAddress} />
               <Stack.Screen name="FormPayment" component={FormPayment} />
+              <Stack.Screen name="Success" component={Success} />
             </Stack.Navigator>
           </SafeAreaView>
         </Layout>
