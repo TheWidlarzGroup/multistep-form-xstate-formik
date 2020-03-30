@@ -7,7 +7,7 @@
  *
  * @format
  */
-import 'react-native-gesture-handler';
+
 import React from 'react';
 import {StatusBar, SafeAreaView, StyleSheet} from 'react-native';
 import {ApplicationProvider, Layout} from '@ui-kitten/components';
