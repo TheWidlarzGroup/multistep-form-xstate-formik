@@ -2,7 +2,7 @@ import {UserData} from '../types/UserData.types';
 import {EventObject} from 'xstate';
 
 export interface UpdateMachineContext {
-  userData: UserData;
+  userData: UserData | null;
   error: boolean;
   errorMsg: string;
 }
