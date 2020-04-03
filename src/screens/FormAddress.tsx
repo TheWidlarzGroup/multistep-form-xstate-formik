@@ -9,6 +9,10 @@ import {
   UserDataMachineContext,
   UserDataMachineEvents,
 } from 'src/machines/userDataMachine.types';
+import {
+  UpdateMachineContext,
+  UpdateMachineEvents,
+} from '../machines/updateMachine.types';
 
 interface Props {
   goBack: () => void;
@@ -19,7 +23,7 @@ interface Props {
 const FormAddress = ({goBack, service, goNext}: Props) => {
   const machine = service.children.get('FormAddress');
   const [current, send] = useService(
-    machine as Interpreter<UserDataMachineContext, any, UserDataMachineEvents>,
+    machine as Interpreter<UpdateMachineContext, any, UpdateMachineEvents>,
   );
 
   return (
