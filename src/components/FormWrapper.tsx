@@ -8,6 +8,8 @@ interface Props {
   nextBtnAction: () => void;
   children: React.ReactChild;
   title: string;
+  backDisabled?: boolean;
+  nextDisabled?: boolean;
 }
 
 const FormWrapper = ({
@@ -15,6 +17,8 @@ const FormWrapper = ({
   nextBtnAction,
   children,
   title,
+  backDisabled,
+  nextDisabled,
 }: Props) => {
   return (
     <Layout style={styles.container}>
@@ -36,6 +40,7 @@ const FormWrapper = ({
             size="medium"
             appearance="ghost"
             status="basic"
+            disabled={backDisabled}
             onPress={backBtnAction}>
             Back
           </Button>
@@ -44,6 +49,7 @@ const FormWrapper = ({
             size="medium"
             appearance="outline"
             status="success"
+            disabled={nextDisabled}
             onPress={nextBtnAction}>
             Next
           </Button>

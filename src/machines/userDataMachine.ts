@@ -93,7 +93,12 @@ export const userDataMachine = Machine<
         id: 'FormName',
         src: updateMachine,
         data: (ctx: UserDataMachineContext) => ctx,
-        onDone: {},
+        onDone: {
+          target: UserDataStates.address,
+          actions: assign({
+            userData: (_, {data}) => data?.userData ?? null,
+          }),
+        },
       },
     },
     [UserDataStates.address]: {
@@ -109,7 +114,12 @@ export const userDataMachine = Machine<
         id: 'FormAddress',
         src: updateMachine,
         data: (ctx: UserDataMachineContext) => ctx,
-        onDone: {},
+        onDone: {
+          target: UserDataStates.payment,
+          actions: assign({
+            userData: (_, {data}) => data?.userData ?? null,
+          }),
+        },
       },
     },
     [UserDataStates.payment]: {
@@ -125,7 +135,12 @@ export const userDataMachine = Machine<
         id: 'FormPayment',
         src: updateMachine,
         data: (ctx: UserDataMachineContext) => ctx,
-        onDone: {},
+        onDone: {
+          target: UserDataStates.complete,
+          actions: assign({
+            userData: (_, {data}) => data?.userData ?? null,
+          }),
+        },
       },
     },
     [UserDataStates.complete]: {

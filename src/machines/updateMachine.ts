@@ -6,6 +6,8 @@ import {
   UpdateStates,
   UpdateEvents,
 } from './updateMachine.types';
+import {UserData} from 'src/types/UserData.types';
+import {updateUser, getUser} from '../data/Api';
 
 export const updateMachine = Machine<
   UpdateMachineContext,
@@ -27,6 +29,7 @@ export const updateMachine = Machine<
           actions: assign({
             error: _ => false,
             errorMsg: _ => '',
+            userData: (_, {userData}) => userData,
           }),
         },
         [UpdateEvents.ERROR]: {
@@ -38,16 +41,18 @@ export const updateMachine = Machine<
         },
       },
       invoke: {
-        src: ctx => async cb => {
+        src: ({userData}) => async cb => {
           try {
-            console.log("hello from child machine, here's the passed context");
+            if (userData) {
+              const response = await getUser(userData);
 
-            console.log(ctx);
-
-            // await new Promise(res => setTimeout(res, 2000));
-            cb({
-              type: UpdateEvents.NEXT,
-            });
+              cb({
+                type: UpdateEvents.NEXT,
+                userData: response,
+              });
+            } else {
+              throw Error('User Data is null');
+            }
           } catch (e) {
             cb({type: UpdateEvents.ERROR});
           }
@@ -58,6 +63,16 @@ export const updateMachine = Machine<
       on: {
         [UpdateEvents.NEXT]: {
           target: UpdateStates.pending,
+          actions: assign({
+            userData: ({userData}, eventData: {[key: string]: any}) => {
+              const updatedUser: UserData = {
+                ...userData,
+                ...(eventData as UserData),
+              };
+
+              return updatedUser;
+            },
+          }),
         },
       },
     },
@@ -68,6 +83,7 @@ export const updateMachine = Machine<
           actions: assign({
             error: _ => false,
             errorMsg: _ => '',
+            userData: (_, {userData}) => userData,
           }),
         },
         [UpdateEvents.ERROR]: {
@@ -79,12 +95,19 @@ export const updateMachine = Machine<
         },
       },
       invoke: {
-        src: _ => async cb => {
+        src: ({userData}) => async cb => {
           try {
-            await new Promise(res => setTimeout(res, 2000));
-            cb({
-              type: UpdateEvents.NEXT,
-            });
+            // CALLING BE TO UPDATE USER
+            if (userData) {
+              const response = await updateUser(userData);
+
+              cb({
+                type: UpdateEvents.NEXT,
+                userData: response,
+              });
+            } else {
+              throw Error('User Data is null');
+            }
           } catch (e) {
             cb({type: UpdateEvents.ERROR});
           }
@@ -93,6 +116,9 @@ export const updateMachine = Machine<
     },
     [UpdateStates.done]: {
       type: 'final',
+      data: {
+        userData: ({userData}: UpdateMachineContext) => userData,
+      },
     },
   },
 });

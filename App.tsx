@@ -111,10 +111,6 @@ const FormFlow = () => {
     send(UserDataEvents.BACK);
   }, [send]);
 
-  const goNext = useCallback(() => {
-    send(UserDataEvents.NEXT);
-  }, [send]);
-
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -142,21 +138,21 @@ const FormFlow = () => {
       <Stack.Screen name="FormName">
         {() =>
           current.matches(UserDataStates.basic) && (
-            <FormName service={service} goBack={goBack} goNext={goNext} />
+            <FormName service={service} goBack={goBack} />
           )
         }
       </Stack.Screen>
       <Stack.Screen name="FormAddress">
         {() =>
           current.matches(UserDataStates.address) && (
-            <FormAddress service={service} goBack={goBack} goNext={goNext} />
+            <FormAddress service={service} goBack={goBack} />
           )
         }
       </Stack.Screen>
       <Stack.Screen name="FormPayment">
         {() =>
           current.matches(UserDataStates.payment) && (
-            <FormPayment service={service} goBack={goBack} goNext={goNext} />
+            <FormPayment service={service} goBack={goBack} />
           )
         }
       </Stack.Screen>
