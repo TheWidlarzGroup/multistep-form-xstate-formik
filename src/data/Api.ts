@@ -64,7 +64,7 @@ const userComplete: UserData = {
 export const getUser = async (prevUser?: UserData) => {
   console.log('Pending...');
 
-  const scenario = getRandomNumber(1, 4);
+  const scenario = getRandomNumber(1, 3);
 
   await new Promise(res => setTimeout(res, 1000));
 

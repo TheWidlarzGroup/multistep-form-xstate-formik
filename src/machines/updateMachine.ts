@@ -38,9 +38,13 @@ export const updateMachine = Machine<
         },
       },
       invoke: {
-        src: _ => async cb => {
+        src: ctx => async cb => {
           try {
-            await new Promise(res => setTimeout(res, 2000));
+            console.log("hello from child machine, here's the passed context");
+
+            console.log(ctx);
+
+            // await new Promise(res => setTimeout(res, 2000));
             cb({
               type: UpdateEvents.NEXT,
             });

@@ -1,4 +1,4 @@
-import {Machine} from 'xstate';
+import {Machine, assign} from 'xstate';
 import {
   UserDataMachineContext,
   UserDataMachineStates,
@@ -6,6 +6,8 @@ import {
   UserDataStates,
   UserDataEvents,
 } from './userDataMachine.types';
+import {getUser} from '../data/Api';
+import {updateMachine} from './updateMachine';
 
 export const userDataMachine = Machine<
   UserDataMachineContext,
@@ -24,12 +26,60 @@ export const userDataMachine = Machine<
       on: {
         [UserDataEvents.BASIC]: {
           target: UserDataStates.basic,
+          actions: assign({
+            userData: (_, {userData}) => userData,
+          }),
         },
         [UserDataEvents.ADDRESS]: {
           target: UserDataStates.address,
+          actions: assign({
+            userData: (_, {userData}) => userData,
+          }),
         },
         [UserDataEvents.PAYMENT]: {
           target: UserDataStates.payment,
+          actions: assign({
+            userData: (_, {userData}) => userData,
+          }),
+        },
+      },
+      invoke: {
+        src: _ => async cb => {
+          try {
+            const userData = await getUser();
+
+            const {
+              name,
+              surname,
+              email,
+              phone,
+              street,
+              city,
+              code,
+              country,
+              account,
+              creaditCardNo,
+              creditCardExp,
+              creditCardCvv,
+            } = userData;
+
+            switch (null) {
+              case name && surname && email && phone:
+                cb({type: UserDataEvents.BASIC, userData});
+                break;
+              case street && city && code && country:
+                cb({type: UserDataEvents.ADDRESS, userData});
+                break;
+              case account && creaditCardNo && creditCardExp && creditCardCvv:
+                cb({type: UserDataEvents.PAYMENT, userData});
+                break;
+              default:
+                cb({type: UserDataEvents.BASIC, userData});
+                break;
+            }
+          } catch (e) {
+            console.log(e.message);
+          }
         },
       },
     },
@@ -38,6 +88,12 @@ export const userDataMachine = Machine<
         [UserDataEvents.NEXT]: {
           target: UserDataStates.address,
         },
+      },
+      invoke: {
+        id: 'FormName',
+        src: updateMachine,
+        data: (ctx: UserDataMachineContext) => ctx,
+        onDone: {},
       },
     },
     [UserDataStates.address]: {
@@ -49,6 +105,12 @@ export const userDataMachine = Machine<
           target: UserDataStates.basic,
         },
       },
+      invoke: {
+        id: 'FormAddress',
+        src: updateMachine,
+        data: (ctx: UserDataMachineContext) => ctx,
+        onDone: {},
+      },
     },
     [UserDataStates.payment]: {
       on: {
@@ -58,6 +120,12 @@ export const userDataMachine = Machine<
         [UserDataEvents.BACK]: {
           target: UserDataStates.address,
         },
+      },
+      invoke: {
+        id: 'FormPayment',
+        src: updateMachine,
+        data: (ctx: UserDataMachineContext) => ctx,
+        onDone: {},
       },
     },
     [UserDataStates.complete]: {

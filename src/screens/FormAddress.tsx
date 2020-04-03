@@ -1,18 +1,29 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {StyleSheet} from 'react-native';
+import {Interpreter} from 'xstate';
+import {useService} from '@xstate/react';
 import {Input} from '@ui-kitten/components';
 import {theme} from '../utils/Theme';
-import {useNavigation} from '@react-navigation/native';
 import FormWrapper from '../components/FormWrapper';
+import {
+  UserDataMachineContext,
+  UserDataMachineEvents,
+} from 'src/machines/userDataMachine.types';
 
-const FormAddress = () => {
-  const {goBack, navigate} = useNavigation();
+interface Props {
+  goBack: () => void;
+  goNext: () => void;
+  service: Interpreter<UserDataMachineContext, any, UserDataMachineEvents, any>;
+}
 
-  const backBtn = useCallback(() => goBack(), [goBack]);
-  const goNext = useCallback(() => navigate('FormPayment'), [navigate]);
+const FormAddress = ({goBack, service, goNext}: Props) => {
+  const machine = service.children.get('FormAddress');
+  const [current, send] = useService(
+    machine as Interpreter<UserDataMachineContext, any, UserDataMachineEvents>,
+  );
 
   return (
-    <FormWrapper title="Address" backBtnAction={backBtn} nextBtnAction={goNext}>
+    <FormWrapper title="Address" backBtnAction={goBack} nextBtnAction={goNext}>
       <>
         <Input
           style={styles.input}
