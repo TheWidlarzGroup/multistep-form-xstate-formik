@@ -1,45 +1,56 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {StyleSheet} from 'react-native';
 import {Input} from '@ui-kitten/components';
 import {theme} from '../utils/Theme';
-import {useNavigation} from '@react-navigation/native';
 import FormWrapper from '../components/FormWrapper';
+import {Interpreter} from 'xstate';
+import {useService} from '@xstate/react';
+import {
+  UserDataMachineContext,
+  UserDataMachineEvents,
+} from '../machines/userDataMachine.types';
 
-const FormPayment = () => {
-  const {goBack, navigate} = useNavigation();
+interface Props {
+  goBack: () => void;
+  goNext: () => void;
+  service: Interpreter<UserDataMachineContext, any, UserDataMachineEvents, any>;
+}
 
-  const backBtn = useCallback(() => goBack(), [goBack]);
-  const goNext = useCallback(() => navigate('Success'), [navigate]);
+const FormPayment = ({goBack, goNext, service}: Props) => {
+  const machine = service.children.get('FormPayment');
+  const [current, send] = useService(
+    machine as Interpreter<UserDataMachineContext, any, UserDataMachineEvents>,
+  );
 
   return (
-    <FormWrapper title="Payment" backBtnAction={backBtn} nextBtnAction={goNext}>
+    <FormWrapper title="Payment" backBtnAction={goBack} nextBtnAction={goNext}>
       <>
         <Input
           style={styles.input}
           label="Account number"
           caption="IBAN format"
-          // value=""
+          value=""
           placeholder="E.g. DE12 1234 1234 1234 1234 44"
           onChangeText={() => null}
         />
         <Input
           style={styles.input}
           label="Credit ard number"
-          // value=""
+          value=""
           placeholder="Your credit card number"
           onChangeText={() => null}
         />
         <Input
           style={styles.input}
           label="Credit card expiration date"
-          // value=""
+          value=""
           placeholder="E.g. 12/22"
           onChangeText={() => null}
         />
         <Input
           style={styles.input}
           label="CVV"
-          // value=""
+          value=""
           placeholder="CVV"
           onChangeText={() => null}
         />

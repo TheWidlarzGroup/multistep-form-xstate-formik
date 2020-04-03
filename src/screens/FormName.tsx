@@ -1,28 +1,39 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {StyleSheet} from 'react-native';
 import {Input} from '@ui-kitten/components';
 import {theme} from '../utils/Theme';
-import {useNavigation} from '@react-navigation/native';
 import FormWrapper from '../components/FormWrapper';
+import {Interpreter} from 'xstate';
+import {useService} from '@xstate/react';
+import {
+  UserDataMachineContext,
+  UserDataMachineEvents,
+} from '../machines/userDataMachine.types';
 
-const FormName = () => {
-  const {goBack, navigate} = useNavigation();
+interface Props {
+  goBack: () => void;
+  goNext: () => void;
+  service: Interpreter<UserDataMachineContext, any, UserDataMachineEvents, any>;
+}
 
-  const backBtn = useCallback(() => goBack(), [goBack]);
-  const goNext = useCallback(() => navigate('FormAddress'), [navigate]);
+const FormName = ({goBack, goNext, service}: Props) => {
+  const machine = service.children.get('FormName');
+  const [current, send] = useService(
+    machine as Interpreter<UserDataMachineContext, any, UserDataMachineEvents>,
+  );
 
   return (
     <FormWrapper
       title="Name and contact"
       nextBtnAction={goNext}
-      backBtnAction={backBtn}>
+      backBtnAction={goBack}>
       <>
         <Input
           style={styles.input}
           caption="Your first name"
           label="First name"
           placeholder="John"
-          // value=""
+          value=""
           onChangeText={() => null}
         />
         <Input
@@ -30,7 +41,7 @@ const FormName = () => {
           caption="Your last name"
           label="Last name"
           placeholder="Doe"
-          // value=""
+          value=""
           onChangeText={() => null}
         />
 
@@ -39,7 +50,7 @@ const FormName = () => {
           caption="You e-mail address"
           label="E-mail"
           placeholder="mail@mail.com"
-          // value=""
+          value=""
           onChangeText={() => null}
         />
         <Input
@@ -48,7 +59,7 @@ const FormName = () => {
           label="Phone"
           keyboardType="number-pad"
           placeholder="123 123 123"
-          // value=""
+          value=""
           onChangeText={() => null}
         />
       </>

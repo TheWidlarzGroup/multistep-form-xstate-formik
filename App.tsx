@@ -8,12 +8,20 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
-import {StatusBar, SafeAreaView, StyleSheet} from 'react-native';
+import React, {useEffect, useCallback} from 'react';
+import {StatusBar, SafeAreaView, StyleSheet, BackHandler} from 'react-native';
 import {ApplicationProvider, Layout} from '@ui-kitten/components';
 import {mapping, dark as darkTheme} from '@eva-design/eva';
-import {NavigationContainer, useNavigation} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  NavigationContainer,
+  useNavigation,
+  useFocusEffect,
+  CommonActions,
+} from '@react-navigation/native';
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from '@react-navigation/stack';
 import Home from './src/screens/Home';
 import FormName from './src/screens/FormName';
 import FormAddress from './src/screens/FormAddress';
@@ -21,7 +29,10 @@ import FormPayment from './src/screens/FormPayment';
 import Success from './src/screens/Success';
 import {useMachine} from '@xstate/react';
 import {userDataMachine} from './src/machines/userDataMachine';
-import {UserDataStates} from './src/machines/userDataMachine.types';
+import {
+  UserDataStates,
+  UserDataEvents,
+} from './src/machines/userDataMachine.types';
 
 const Stack = createStackNavigator();
 const Root = createStackNavigator();
@@ -29,35 +40,129 @@ const Root = createStackNavigator();
 const FormFlow = () => {
   const nav = useNavigation();
   const {navigate} = nav;
-  const [current] = useMachine(userDataMachine);
+  const [current, send, service] = useMachine(userDataMachine);
 
   useEffect(() => {
     switch (true) {
       case current.matches(UserDataStates.basic):
-        navigate('FormName');
+        nav.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [
+              {
+                name: 'FormName',
+              },
+            ],
+          }),
+        );
         break;
       case current.matches(UserDataStates.address):
-        navigate('FormAddress');
+        nav.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [
+              {
+                name: 'FormAddress',
+              },
+            ],
+          }),
+        );
         break;
       case current.matches(UserDataStates.payment):
-        navigate('FormPayment');
+        nav.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [
+              {
+                name: 'FormPayment',
+              },
+            ],
+          }),
+        );
         break;
       case current.matches(UserDataStates.complete):
-        navigate('Success');
+        nav.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [
+              {
+                name: 'Success',
+              },
+            ],
+          }),
+        );
         break;
       default:
-        navigate('Home');
+        nav.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [
+              {
+                name: 'Home',
+              },
+            ],
+          }),
+        );
         break;
     }
   }, [current]);
 
+  const goBack = useCallback(() => {
+    send(UserDataEvents.BACK);
+  }, [send]);
+
+  const goNext = useCallback(() => {
+    send(UserDataEvents.NEXT);
+  }, [send]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        goBack();
+
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [current, goBack]),
+  );
+
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        gestureEnabled: false,
+        cardStyle: styles.cardStyle,
+        cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid,
+      }}>
       <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="FormName" component={FormName} />
-      <Stack.Screen name="FormAddress" component={FormAddress} />
-      <Stack.Screen name="FormPayment" component={FormPayment} />
-      <Stack.Screen name="Success" component={Success} />
+      <Stack.Screen name="FormName">
+        {() =>
+          current.matches(UserDataStates.basic) && (
+            <FormName service={service} goBack={goBack} goNext={goNext} />
+          )
+        }
+      </Stack.Screen>
+      <Stack.Screen name="FormAddress">
+        {() =>
+          current.matches(UserDataStates.address) && (
+            <FormAddress service={service} goBack={goBack} goNext={goNext} />
+          )
+        }
+      </Stack.Screen>
+      <Stack.Screen name="FormPayment">
+        {() =>
+          current.matches(UserDataStates.payment) && (
+            <FormPayment service={service} goBack={goBack} goNext={goNext} />
+          )
+        }
+      </Stack.Screen>
+      <Stack.Screen name="Success">
+        {() => <Success goBack={goBack} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 };
@@ -70,7 +175,10 @@ const App = () => {
           <SafeAreaView style={styles.wrapper}>
             <StatusBar barStyle="light-content" />
             <Root.Navigator
-              screenOptions={{headerShown: false}}
+              screenOptions={{
+                headerShown: false,
+                cardStyle: styles.cardStyle,
+              }}
               initialRouteName="Form">
               <Root.Screen name="Form" component={FormFlow} />
               {/* ANOTHER PART OF THE APP */}
@@ -82,8 +190,13 @@ const App = () => {
   );
 };
 
+console.log(mapping);
+
 const styles = StyleSheet.create({
   wrapper: {flex: 1},
+  cardStyle: {
+    backgroundColor: darkTheme['color-basic-800'],
+  },
 });
 
 export default App;

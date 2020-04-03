@@ -1,19 +1,16 @@
 import React from 'react';
-import {Layout, Text, Button} from '@ui-kitten/components';
+import {Layout, Text, Spinner} from '@ui-kitten/components';
 import {StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {theme} from '../utils/Theme';
 
 const Home = () => {
-  const {navigate} = useNavigation();
-
-  const goNext = () => navigate('FormName');
-
   return (
     <Layout style={styles.container}>
-      <Text category="h1">Form App</Text>
-      <Button size="large" appearance="ghost" status="primary" onPress={goNext}>
-        Form
-      </Button>
+      <Text style={styles.text} category="h1">
+        Form App
+      </Text>
+      <Text style={styles.text}>Fetching user data</Text>
+      <Spinner status="success" />
     </Layout>
   );
 };
@@ -24,6 +21,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  text: {marginBottom: theme.spacing.value * 4},
 });
 
 export default Home;
