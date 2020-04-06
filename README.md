@@ -2,6 +2,8 @@
 
 ## Made with React Native, XState, Formik, Yup and UI Kitten
 
+![](./app.gif)
+
 ---
 
 ### Description
