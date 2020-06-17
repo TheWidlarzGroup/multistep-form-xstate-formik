@@ -6,7 +6,7 @@
 
 ### Description
 
-This app is a part of an article X
+This app is a part of an article [Multistep form handling with Finite State Machines, Formik and TypeScript](https://thewidlarzgroup.com/multistep-form-xstate-formik/)
 
 ---
 
